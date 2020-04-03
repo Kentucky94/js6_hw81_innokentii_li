@@ -17,6 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 const connections = {};
+const activeUsers = {};
 
 const run = async () => {
   await mongoose.connect(config.database, config.dbConfig);
@@ -33,6 +34,7 @@ const run = async () => {
 
     const wsId = nanoid().toString();
     connections[wsId] = ws;
+    activeUsers[wsId] = user.username;
 
     console.log(`${user.username} connected, Total connections: ${Object.keys(connections).length}`);
 
@@ -42,6 +44,15 @@ const run = async () => {
       type: 'LAST_MESSAGES',
       messages: lastMessages
     }));
+
+    Object.keys(connections).forEach(connId => {
+      const connection = connections[connId];
+
+      connection.send(JSON.stringify({
+        type: 'ACTIVE_USERS',
+        users: activeUsers,
+      }))
+    });
 
     ws.on('message', async (msg) => {
       const parsed = JSON.parse(msg);
@@ -73,9 +84,9 @@ const run = async () => {
       }
     });
     //
-    ws.on('close', (msg) => {
+    ws.on('close', async (msg) => {
       delete connections[wsId];
-
+      delete activeUsers[wsId];
       console.log(`${user.username} disconnected, Total connections: ${Object.keys(connections).length}`);
     })
   });

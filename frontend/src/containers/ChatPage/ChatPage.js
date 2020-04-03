@@ -23,6 +23,10 @@ class ChatPage extends Component {
               this.setState({messages: data.messages});
               break;
 
+            case 'ACTIVE_USERS':
+              this.setState({users: data.users});
+              break;
+
             case 'NEW_MESSAGE':
               console.log(data);
 
@@ -58,6 +62,16 @@ class ChatPage extends Component {
   };
 
   render() {
+    const users = Object.keys(this.state.users).map(key => {
+      const user = this.state.users[key];
+
+      return (
+        <div key={key}>
+          {user}
+        </div>
+      )
+    });
+
     const messages = this.state.messages.map(message => (
       <div key={message.user._id}>
         {message.user.username}: {message.text}
@@ -67,7 +81,7 @@ class ChatPage extends Component {
     return (
       <div className="ChatPage">
         <div className="leftBar">
-
+          {users}
         </div>
         <div className="rightBar">
           <div className="MessageBlock">
