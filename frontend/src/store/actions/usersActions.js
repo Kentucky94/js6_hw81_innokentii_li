@@ -50,11 +50,9 @@ export const loginUser = loginData => {
 };
 
 export const logoutUser = () => {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     try{
-      const user = getState().users.user;
-
-      await axiosOrders.delete('/users/sessions', {headers: {'Authorization': 'Token ' + user.token}});
+      await axiosOrders.delete('/users/sessions');
 
       dispatch(logoutUserSuccess());
     }catch(error){

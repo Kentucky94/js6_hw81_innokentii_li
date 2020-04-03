@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import './ChatPage.css'
 import {connect} from "react-redux";
+import {createMessage, fetchMessages} from "../../store/actions/messgesActions";
 
 class ChatPage extends Component {
   state = {
     text: '',
+    users: {},
     messages: [],
   };
 
@@ -12,16 +14,25 @@ class ChatPage extends Component {
     if(!!this.props.user){
       this.websocket = new WebSocket(`ws://localhost:8080/chat?token=${this.props.user.token}`);
 
-      this.websocket.onmessage = (message) => {
+      this.websocket.onmessage = async (message) => {
         try{
           const data = JSON.parse(message.data);
-          console.log(data);
+
           switch(data.type){
             case 'LAST_MESSAGES':
               this.setState({messages: data.messages});
               break;
+
             case 'NEW_MESSAGE':
-              console.log(data.username);
+              console.log(data);
+
+              const newMessage = {
+                user: {_id: data.id, username: data.username},
+                text: data.text,
+              };
+
+              this.setState({messages: [...this.state.messages, newMessage]});
+
               break;
           }
         }catch(error){
@@ -48,15 +59,15 @@ class ChatPage extends Component {
 
   render() {
     const messages = this.state.messages.map(message => (
-      <div key={message._id}>
-        {message.text}
+      <div key={message.user._id}>
+        {message.user.username}: {message.text}
       </div>
     ));
 
     return (
       <div className="ChatPage">
         <div className="leftBar">
-          ergergeh
+
         </div>
         <div className="rightBar">
           <div className="MessageBlock">
@@ -80,7 +91,13 @@ class ChatPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  user: state.users.user
+  user: state.users.user,
+  messages: state.messages.messages,
 });
 
-export default connect(mapStateToProps, null)(ChatPage);
+const mapDispatchToProps = dispatch => ({
+  fetchMessages: () => dispatch(fetchMessages()),
+  createMessage: messageData => dispatch(createMessage(messageData))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatPage);

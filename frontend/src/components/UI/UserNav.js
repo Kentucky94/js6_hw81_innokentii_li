@@ -8,9 +8,6 @@ const UserNav = props => {
       <NavbarText className="mr-2">
         {'Hello, ' + props.user.username+ '!'}
       </NavbarText>
-      <NavItem>
-        <NavLink tag={RouterNavLink} to="/items/add">Add new item</NavLink>
-      </NavItem>
       <NavbarText className="btn btn-danger" onClick={props.onClick}>
         Logout
       </NavbarText>

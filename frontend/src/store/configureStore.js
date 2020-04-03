@@ -5,6 +5,7 @@ import {createBrowserHistory} from "history";
 
 import usersReducer from "./reducers/usersReducer";
 import {loadFromLocalStorage, localStorageMiddleware} from "./localStorage";
+import messagesReducer from "./reducers/messagesReducer";
 
 export const history = createBrowserHistory();
 
@@ -13,6 +14,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const rootReducer = combineReducers({
   router: connectRouter(history),
   users: usersReducer,
+  messages: messagesReducer
 });
 
 const middleware = [

@@ -28,25 +28,19 @@ const run = async () => {
     const token = req.query.token;
     if(!token) throw new Error('User not authorized');
 
-    console.log(token);
-
     const user = await User.findOne({token});
-    if(!user) throw new Error('User not authorized');
+    if(!user) throw new Error('User not registered');
 
-    const wsId = nanoid();
+    const wsId = nanoid().toString();
     connections[wsId] = ws;
 
     console.log(`${user.username} connected, Total connections: ${Object.keys(connections).length}`);
 
-    const messages = await Message.find().populate({path: 'user', select: 'username'});
-
-    console.log(messages);
-
-    // messages.slice(-30);
+    const lastMessages = await Message.find().populate({path: 'user', select: 'username'});
 
     ws.send(JSON.stringify({
       type: 'LAST_MESSAGES',
-      messages
+      messages: lastMessages
     }));
 
     ws.on('message', async (msg) => {
@@ -55,27 +49,30 @@ const run = async () => {
       switch(parsed.type){
         case 'CREATE_MESSAGE':
           const messageData = {
-            user: user._id,
+            id: user._id,
+            username: user.username,
             text: parsed.text,
           };
 
-          const message = new Message(messageData);
+          Object.keys(connections).forEach(connId => {
+            const connection = connections[connId];
 
-          await message.save();
+            connection.send(JSON.stringify({
+              type: 'NEW_MESSAGE',
+              ...messageData
+            }))
+          });
 
-          Object.keys()
-
-          ws.send(JSON.stringify({
-            type: 'NEW_MESSAGE',
-            ...message,
-          }));
+          const newMessage = new Message({user: user._id, text: parsed.text});
+          await newMessage.save();
 
           break;
+
         default:
           console.log('No type ' + parsed.type);
       }
     });
-
+    //
     ws.on('close', (msg) => {
       delete connections[wsId];
 

@@ -24,7 +24,7 @@ router.post('/', auth, async (req, res) => {
 
 router.get('/', async (req, res) => {
   try{
-    const messages = await Message.find().populate({path: 'user'});
+    const messages = await Message.find().populate({path: 'user', select: 'username'});
 
     res.send(messages);
   }catch(error){
