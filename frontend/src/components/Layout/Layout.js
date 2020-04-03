@@ -1,12 +1,10 @@
 import React from 'react';
-import './Layout.css';
+import Header from "../Header/Header";
 
 const Layout = props => {
   return (
     <div className="Layout">
-      <div className="Header">
-
-      </div>
+      <Header/>
       {props.children}
     </div>
   );

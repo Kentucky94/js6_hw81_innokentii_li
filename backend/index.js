@@ -28,7 +28,9 @@ const run = async () => {
     const token = req.query.token;
     if(!token) throw new Error('User not authorized');
 
-    const user = await User.findOne(token);
+    console.log(token);
+
+    const user = await User.findOne({token});
     if(!user) throw new Error('User not authorized');
 
     const wsId = nanoid();
@@ -36,7 +38,11 @@ const run = async () => {
 
     console.log(`${user.username} connected, Total connections: ${Object.keys(connections).length}`);
 
-    const messages = await Message.find().populate({path: 'user', select: 'username'}).toArray().slice(-30);
+    const messages = await Message.find().populate({path: 'user', select: 'username'});
+
+    console.log(messages);
+
+    // messages.slice(-30);
 
     ws.send(JSON.stringify({
       type: 'LAST_MESSAGES',
@@ -47,7 +53,7 @@ const run = async () => {
       const parsed = JSON.parse(msg);
 
       switch(parsed.type){
-        case CREATE_MESSAGE:
+        case 'CREATE_MESSAGE':
           const messageData = {
             user: user._id,
             text: parsed.text,
@@ -56,6 +62,8 @@ const run = async () => {
           const message = new Message(messageData);
 
           await message.save();
+
+          Object.keys()
 
           ws.send(JSON.stringify({
             type: 'NEW_MESSAGE',

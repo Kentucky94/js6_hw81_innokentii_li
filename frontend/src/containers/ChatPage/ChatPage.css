@@ -1,0 +1,29 @@
+.ChatPage{
+  display: flex;
+  justify-content: space-between;
+}
+
+.leftBar{
+  border: 1px solid black;
+  width: 30%;
+  min-height: 70vh;
+  padding: 20px;
+}
+
+.rightBar{
+  border: 1px solid black;
+  width: 70%;
+  min-height: 70vh;
+  padding: 20px;
+  position: relative;
+}
+
+.InputForm{
+  border: 1px solid black;
+  margin: 0;
+  width: 100%;
+  padding: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}

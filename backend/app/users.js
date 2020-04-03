@@ -1,6 +1,7 @@
 const express = require('express');
 
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -43,7 +44,7 @@ router.post('/sessions', async (req, res) => {
   }
 });
 
-router.delete('/sessions', async (req, res) => {
+router.delete('/sessions', auth, async (req, res) => {
   const success = {message: "Success"};
 
   try{
@@ -51,7 +52,7 @@ router.delete('/sessions', async (req, res) => {
 
     if(!token) return res.send(success);
 
-    const user = await User.findOne(token);
+    const user = await User.findOne({token});
 
     if(!user) return res.send(success);
 

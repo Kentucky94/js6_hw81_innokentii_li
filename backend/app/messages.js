@@ -22,9 +22,9 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try{
-    const messages = await Message.find().populate({path: 'user', select: 'username'});
+    const messages = await Message.find().populate({path: 'user'});
 
     res.send(messages);
   }catch(error){

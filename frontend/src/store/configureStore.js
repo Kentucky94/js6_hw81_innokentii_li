@@ -1,11 +1,14 @@
-import {applyMiddleware, combineReducers, createStore} from "redux";
-import usersReducer from "./reducers/usersReducer";
-import thunkMiddleware from "redux-thunk";
-import {loadFromLocalStorage, localStorageMiddleware} from "./localStorage";
+import {applyMiddleware, combineReducers, compose, createStore} from "redux";
+import {connectRouter, routerMiddleware} from 'connected-react-router';
+import thunkMiddleware from 'redux-thunk';
 import {createBrowserHistory} from "history";
-import {connectRouter, routerMiddleware} from "connected-react-router";
+
+import usersReducer from "./reducers/usersReducer";
+import {loadFromLocalStorage, localStorageMiddleware} from "./localStorage";
 
 export const history = createBrowserHistory();
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const rootReducer = combineReducers({
   router: connectRouter(history),
@@ -15,11 +18,13 @@ const rootReducer = combineReducers({
 const middleware = [
   thunkMiddleware,
   routerMiddleware(history),
-  localStorageMiddleware,
+  localStorageMiddleware
 ];
+
+const enhancers = composeEnhancers(applyMiddleware(...middleware));
 
 const persistedState = loadFromLocalStorage();
 
-const store = createStore(rootReducer, persistedState, applyMiddleware(...middleware));
+const store = createStore(rootReducer, persistedState, enhancers);
 
-export default store
+export default store;
